@@ -5,6 +5,8 @@ import { storage } from "./storage";
 import { registerAuthRoutes } from "./replit_integrations/auth";
 import { api } from "@shared/routes";
 import { z } from "zod";
+import { db } from "./db";
+import { drugPrices } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,

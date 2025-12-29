@@ -1,12 +1,5 @@
 import { db } from "./db";
-import {
-  doctors,
-  userSettings,
-  type Doctor,
-  type InsertDoctor,
-  type UserSettings,
-  type InsertUserSettings,
-} from "@shared/schema";
+import { users, doctors, userSettings, drugPrices, type User, type Doctor, type InsertDoctor, type UserSettings, type InsertUserSettings, type DrugPrice } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {

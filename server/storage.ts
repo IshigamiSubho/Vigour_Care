@@ -1,38 +1,82 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { db } from "./db";
+import {
+  doctors,
+  userSettings,
+  type Doctor,
+  type InsertDoctor,
+  type UserSettings,
+  type InsertUserSettings,
+} from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  // Doctors
+  getDoctors(): Promise<Doctor[]>;
+  getDoctor(id: number): Promise<Doctor | undefined>;
+  createDoctor(doctor: InsertDoctor): Promise<Doctor>;
+
+  // Settings
+  getUserSettings(userId: string): Promise<UserSettings | undefined>;
+  createUserSettings(settings: InsertUserSettings): Promise<UserSettings>;
+  updateUserLocation(userId: string, lat: number, lng: number, address?: string): Promise<UserSettings>;
+  updateUserTheme(userId: string, theme: string): Promise<UserSettings>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DatabaseStorage implements IStorage {
+  // Doctors
+  async getDoctors(): Promise<Doctor[]> {
+    return await db.select().from(doctors);
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getDoctor(id: number): Promise<Doctor | undefined> {
+    const [doctor] = await db.select().from(doctors).where(eq(doctors.id, id));
+    return doctor;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async createDoctor(insertDoctor: InsertDoctor): Promise<Doctor> {
+    const [doctor] = await db.insert(doctors).values(insertDoctor).returning();
+    return doctor;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  // Settings
+  async getUserSettings(userId: string): Promise<UserSettings | undefined> {
+    const [settings] = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
+    return settings;
+  }
+
+  async createUserSettings(settings: InsertUserSettings): Promise<UserSettings> {
+    const [newSettings] = await db.insert(userSettings).values(settings).returning();
+    return newSettings;
+  }
+
+  async updateUserLocation(userId: string, lat: number, lng: number, address?: string): Promise<UserSettings> {
+    // Check if settings exist, if not create
+    let settings = await this.getUserSettings(userId);
+    if (!settings) {
+       return this.createUserSettings({ userId, locationLat: lat, locationLng: lng, locationName: address, theme: 'light' });
+    }
+
+    const [updated] = await db
+      .update(userSettings)
+      .set({ locationLat: lat, locationLng: lng, locationName: address })
+      .where(eq(userSettings.userId, userId))
+      .returning();
+    return updated;
+  }
+
+  async updateUserTheme(userId: string, theme: string): Promise<UserSettings> {
+    let settings = await this.getUserSettings(userId);
+    if (!settings) {
+       return this.createUserSettings({ userId, theme, locationLat: null, locationLng: null, locationName: null });
+    }
+
+    const [updated] = await db
+      .update(userSettings)
+      .set({ theme })
+      .where(eq(userSettings.userId, userId))
+      .returning();
+    return updated;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

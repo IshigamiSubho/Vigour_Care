@@ -57,6 +57,26 @@ export const api = {
         200: z.custom<typeof userSettings.$inferSelect>(),
       },
     }
+  },
+  drugs: {
+    search: {
+      method: 'GET' as const,
+      path: '/api/drugs/search',
+      input: z.object({ q: z.string() }),
+      responses: {
+        200: z.array(z.custom<typeof drugPrices.$inferSelect>()),
+      },
+    }
+  },
+  profile: {
+    updateAvatar: {
+      method: 'PATCH' as const,
+      path: '/api/profile/avatar',
+      input: z.object({ avatarUrl: z.string() }),
+      responses: {
+        200: z.custom<typeof users.$inferSelect>(),
+      }
+    }
   }
 };
 

@@ -9,6 +9,7 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/Landing";
 import Home from "@/pages/Home";
 import Settings from "@/pages/Settings";
+import ConsumerPrices from "@/pages/ConsumerPrices";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -36,6 +37,9 @@ function Router() {
       </Route>
       <Route path="/settings">
         <ProtectedRoute component={Settings} />
+      </Route>
+      <Route path="/prices">
+        <ProtectedRoute component={ConsumerPrices} />
       </Route>
       <Route component={NotFound} />
     </Switch>

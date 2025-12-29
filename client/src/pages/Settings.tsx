@@ -1,7 +1,8 @@
 import { Navigation } from "@/components/Navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { useSettings, useToggleTheme, useUpdateLocation } from "@/hooks/use-settings";
-import { LogOut, Moon, Sun, MapPin, Loader2, Navigation as NavIcon } from "lucide-react";
+import { useUpdateAvatar } from "@/hooks/use-drugs";
+import { LogOut, Moon, Sun, MapPin, Loader2, Navigation as NavIcon, Camera } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
@@ -10,6 +11,12 @@ export default function Settings() {
   const { data: settings, isLoading: loadingSettings } = useSettings();
   const updateLocation = useUpdateLocation();
   const toggleTheme = useToggleTheme();
+  const updateAvatar = useUpdateAvatar();
+
+  const handleAvatarUpload = () => {
+    const url = prompt("Enter profile picture URL:");
+    if (url) updateAvatar.mutate(url);
+  };
   
   const [detectingLocation, setDetectingLocation] = useState(false);
 
@@ -66,8 +73,20 @@ export default function Settings() {
         {/* Profile Section */}
         <section className="bg-card rounded-2xl p-6 border border-border shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl">
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
+            <div className="relative group">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl overflow-hidden">
+                {user?.avatarUrl ? (
+                  <img src={user.avatarUrl} className="w-full h-full object-cover" />
+                ) : (
+                  <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
+                )}
+              </div>
+              <button 
+                onClick={handleAvatarUpload}
+                className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Camera className="w-6 h-6 text-white" />
+              </button>
             </div>
             <div>
               <h2 className="text-xl font-bold text-foreground">{user?.firstName} {user?.lastName}</h2>

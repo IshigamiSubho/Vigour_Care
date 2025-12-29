@@ -20,6 +20,10 @@ export interface IStorage {
   createUserSettings(settings: InsertUserSettings): Promise<UserSettings>;
   updateUserLocation(userId: string, lat: number, lng: number, address?: string): Promise<UserSettings>;
   updateUserTheme(userId: string, theme: string): Promise<UserSettings>;
+
+  // Drugs
+  searchDrugs(query: string): Promise<DrugPrice[]>;
+  updateUserAvatar(userId: string, avatarUrl: string): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -74,6 +78,23 @@ export class DatabaseStorage implements IStorage {
       .update(userSettings)
       .set({ theme })
       .where(eq(userSettings.userId, userId))
+      .returning();
+    return updated;
+  }
+
+  // Drugs
+  async searchDrugs(query: string): Promise<DrugPrice[]> {
+    const results = await db.select().from(drugPrices);
+    return results.filter(drug => 
+      drug.name.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+
+  async updateUserAvatar(userId: string, avatarUrl: string): Promise<User> {
+    const [updated] = await db
+      .update(users)
+      .set({ avatarUrl, updatedAt: new Date() })
+      .where(eq(users.id, userId))
       .returning();
     return updated;
   }

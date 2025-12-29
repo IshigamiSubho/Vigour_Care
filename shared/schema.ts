@@ -22,6 +22,20 @@ export const insertDoctorSchema = createInsertSchema(doctors).omit({ id: true })
 export type Doctor = typeof doctors.$inferSelect;
 export type InsertDoctor = z.infer<typeof insertDoctorSchema>;
 
+// === DRUG PRICES ===
+export const drugPrices = pgTable("drug_prices", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  dosageForm: text("dosage_form"),
+  strength: text("strength"),
+  ceilingPrice: doublePrecision("ceiling_price").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertDrugPriceSchema = createInsertSchema(drugPrices).omit({ id: true, updatedAt: true });
+export type DrugPrice = typeof drugPrices.$inferSelect;
+export type InsertDrugPrice = z.infer<typeof insertDrugPriceSchema>;
+
 // === USER SETTINGS ===
 // Extension of the user profile for settings
 export const userSettings = pgTable("user_settings", {

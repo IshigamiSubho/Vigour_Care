@@ -56,6 +56,29 @@ export async function registerRoutes(
     res.json(updated);
   });
 
+  app.get(api.drugs.search.path, async (req: any, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const query = req.query.q as string;
+    if (!query) return res.json([]);
+    const results = await storage.searchDrugs(query);
+    res.json(results);
+  });
+
+  app.patch(api.profile.updateAvatar.path, async (req: any, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    try {
+      const { avatarUrl } = api.profile.updateAvatar.input.parse(req.body);
+      const userId = req.user.claims.sub;
+      const updatedUser = await storage.updateUserAvatar(userId, avatarUrl);
+      res.json(updatedUser);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data" });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Seed Data
   const doctorsList = await storage.getDoctors();
   if (doctorsList.length === 0) {
@@ -89,6 +112,20 @@ export async function registerRoutes(
       longitude: -73.9860,
       imageUrl: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=300&h=300"
     });
+  }
+
+  const drugList = await storage.searchDrugs("Paracetamol");
+  if (drugList.length === 0) {
+    const commonDrugs = [
+      { name: "Paracetamol", dosageForm: "Tablet", strength: "500mg", ceilingPrice: 2.04 },
+      { name: "Amoxicillin", dosageForm: "Capsule", strength: "250mg", ceilingPrice: 5.42 },
+      { name: "Metformin", dosageForm: "Tablet", strength: "500mg", ceilingPrice: 1.85 },
+      { name: "Atorvastatin", dosageForm: "Tablet", strength: "10mg", ceilingPrice: 8.24 },
+      { name: "Amlodipine", dosageForm: "Tablet", strength: "5mg", ceilingPrice: 2.45 },
+    ];
+    for (const drug of commonDrugs) {
+      await db.insert(drugPrices).values(drug);
+    }
   }
 
   return httpServer;

@@ -94,8 +94,8 @@ export default function Home() {
             </div>
             
             {!settings?.locationLat && (
-              <div className="mb-6 bg-accent/10 border border-accent/20 rounded-xl p-4 flex items-center gap-3 text-sm text-accent-foreground">
-                <MapPinOff className="w-5 h-5 shrink-0" />
+              <div className="mb-6 bg-muted border border-border rounded-xl p-4 flex items-center gap-3 text-sm text-foreground">
+                <MapPinOff className="w-5 h-5 shrink-0 text-foreground" />
                 <p>Location not set. Distances will not be shown. Go to Settings to enable.</p>
               </div>
             )}

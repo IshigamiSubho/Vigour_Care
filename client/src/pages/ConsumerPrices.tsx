@@ -54,8 +54,8 @@ export default function ConsumerPrices() {
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Ceiling Price</p>
-                      <p className="text-2xl font-display font-black text-primary">₹{drug.ceilingPrice.toFixed(2)}</p>
-                      <p className="text-sm text-muted-foreground">in rupees</p>
+                      <p className="text-2xl font-display font-black text-primary">{drug.ceilingPrice.toFixed(2)} Rs</p>
+                      <p className="text-sm text-muted-foreground">per unit</p>
                     </div>
                   </CardContent>
                 </Card>

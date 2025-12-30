@@ -1,8 +1,19 @@
 import logo from "@assets/vc_1766993579360.png";
 import { motion } from "framer-motion";
 import { ArrowRight, ShieldCheck, Activity, Users } from "lucide-react";
+import { useEffect } from "react";
+import { useSettings } from "@/hooks/use-settings";
 
 export default function Landing() {
+  const { data: settings } = useSettings();
+  
+  useEffect(() => {
+    if (settings?.theme) {
+      if (settings.theme === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    }
+  }, [settings?.theme]);
+
   const handleLogin = () => {
     window.location.href = "/api/login";
   };
@@ -16,9 +27,9 @@ export default function Landing() {
 
       {/* Nav */}
       <nav className="relative z-10 p-6 md:p-8 flex justify-between items-center max-w-7xl mx-auto w-full">
-        <div className="flex items-center gap-3">
-          <img src={logo} alt="VigourCare Logo" className="h-10 w-auto" />
-          <span className="font-display font-bold text-2xl text-foreground hidden sm:block">
+        <div className="flex items-center gap-4">
+          <img src={logo} alt="VigourCare Logo" className="h-14 w-auto" />
+          <span className="font-display font-bold text-3xl text-foreground hidden sm:block">
             VigourCare
           </span>
         </div>

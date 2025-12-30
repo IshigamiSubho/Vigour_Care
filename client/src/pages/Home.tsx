@@ -48,12 +48,6 @@ export default function Home() {
       <Navigation />
       
       <main className="max-w-5xl mx-auto px-4 md:px-6 pt-6 md:pt-24 space-y-8">
-        {/* Desktop Header */}
-        <div className="hidden md:flex items-center gap-4 mb-8">
-          <img src={logo} alt="VigourCare Logo" className="h-16 w-auto" />
-          <h1 className="text-4xl font-display font-bold text-foreground">VigourCare</h1>
-        </div>
-
         {/* Mobile Header */}
         <div className="md:hidden flex items-center justify-between mb-6">
           <div>
